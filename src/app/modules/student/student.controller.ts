@@ -11,13 +11,6 @@ const createStudent = async (req: Request, res: Response) => {
 
     // data validation with Joi library
     // const { error, value } = studentValidationSchema.validate(studentData);
-    // if (error) {
-    //   return res.status(500).json({
-    //     success: false,
-    //     message: error.message,
-    //     error: error.details,
-    //   });
-    // }
 
     // will cal service function to save data to DB
     const result = await studentServices.createStudentToDB(zodParsedData);
@@ -30,7 +23,7 @@ const createStudent = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "something went wrong",
       error: error,
     });
   }
@@ -71,8 +64,27 @@ const getSingleStudent = async (req: Request, res: Response) => {
   }
 };
 
+const deleteSingleStudent = async (req: Request, res: Response) => {
+  try {
+    const { studentId } = req.params;
+    const result = await studentServices.deleteSingleStudentFromDB(studentId);
+    res.status(200).json({
+      success: true,
+      message: "Student is deleted successfully.",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      data: [],
+    });
+  }
+};
+
 export const studentControllers = {
   createStudent,
   getAllStudents,
   getSingleStudent,
+  deleteSingleStudent,
 };

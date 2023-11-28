@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { Schema, model } from "mongoose";
 
 import validator from "validator";
-import config from "../config";
+import config from "../../config";
 import {
   StudentMethods,
   StudentModel,
@@ -10,7 +10,7 @@ import {
   TLocalGuardian,
   TStudent,
   TStudentName,
-} from "./student/student.interface";
+} from "./student.interface";
 
 const studentNameSchema = new Schema<TStudentName>({
   firstName: {

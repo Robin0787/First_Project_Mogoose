@@ -29,7 +29,7 @@ const UserSchema = new Schema<TUser>(
         values: ["in-progress", "blocked"],
         message: "{VALUE} is not a valid value for status",
       },
-      required: true,
+      default: "in-progress",
     },
     isDeleted: {
       type: Boolean,

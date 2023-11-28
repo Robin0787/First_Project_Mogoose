@@ -37,6 +37,7 @@ const studentValidationSchemaWithZod = z.object({
   dateOfBirth: z.string(),
   contactNo: z.string(),
   emergencyContactNo: z.string(),
+  academicDepartment: z.string(),
   bloodGroup: z.enum(["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"]),
   presentAddress: z.string(),
   permanentAddress: z.string(),

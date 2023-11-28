@@ -1,8 +1,6 @@
-import bcrypt from "bcrypt";
 import { Schema, model } from "mongoose";
 
 import validator from "validator";
-import config from "../../config";
 import {
   StudentMethods,
   StudentModel,
@@ -57,6 +55,12 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>(
   {
     id: { type: String, required: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+      ref: "User",
+    },
     name: {
       type: studentNameSchema,
       required: true,
@@ -70,13 +74,6 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>(
         message: "{VALUE} is not a valid email.",
       },
     },
-    password: {
-      type: String,
-      required: true,
-      minlength: [8, "password must be more than 7 characters"],
-      maxlength: [20, "password must be within 20 characters"],
-      select: false,
-    },
     gender: {
       type: String,
       enum: {
@@ -88,6 +85,7 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>(
     dateOfBirth: { type: String },
     contactNo: { type: String, required: true },
     emergencyContactNo: { type: String, required: true },
+    academicDepartment: { type: String, required: true },
     bloodGroup: {
       type: String,
       enum: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
@@ -103,17 +101,13 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>(
       required: true,
     },
     profileImage: { type: String },
-    isActive: {
-      type: String,
-      enum: ["Active", "Blocked"],
-      default: "Active",
-    },
     isDeleted: { type: Boolean, default: false },
   },
   {
     toJSON: {
       virtuals: true,
     },
+    timestamps: true,
   },
 );
 
@@ -123,11 +117,12 @@ studentSchema.virtual("fullName").get(function () {
 });
 
 // pre middleware for hashing user password.
-studentSchema.pre("save", async function (next) {
-  const user = this;
-  user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt));
-  next();
-});
+// studentSchema.pre("save", async function (next) {
+//   const user = this;
+//   user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt));
+//   next();
+// });
+
 // post middleware for hiding user password.
 studentSchema.post("save", async function (doc, next) {
   doc.password = "";

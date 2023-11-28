@@ -1,33 +1,32 @@
 import { Request, Response } from "express";
 import { studentServices } from "./student.service";
-import studentValidationSchemaWithZod from "./student.validation.zod";
 
-const createStudent = async (req: Request, res: Response) => {
-  try {
-    const { student: studentData } = req.body;
+// const createStudent = async (req: Request, res: Response) => {
+//   try {
+//     const { student: studentData } = req.body;
 
-    // data validation with Zod library
-    const zodParsedData = studentValidationSchemaWithZod.parse(studentData);
+//     // data validation with Zod library
+//     const zodParsedData = studentValidationSchemaWithZod.parse(studentData);
 
-    // data validation with Joi library
-    // const { error, value } = studentValidationSchema.validate(studentData);
+//     // data validation with Joi library
+//     // const { error, value } = studentValidationSchema.validate(studentData);
 
-    // will cal service function to save data to DB
-    const result = await studentServices.createStudentToDB(zodParsedData);
+//     // will cal service function to save data to DB
+//     const result = await studentServices.createStudentToDB(zodParsedData);
 
-    res.status(200).json({
-      success: true,
-      message: "Student is created successfully",
-      data: result,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "something went wrong",
-      error: error,
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       message: "Student is created successfully",
+//       data: result,
+//     });
+//   } catch (error: any) {
+//     res.status(500).json({
+//       success: false,
+//       message: error.message || "something went wrong",
+//       error: error,
+//     });
+//   }
+// };
 
 const getAllStudents = async (req: Request, res: Response) => {
   try {
@@ -83,7 +82,6 @@ const deleteSingleStudent = async (req: Request, res: Response) => {
 };
 
 export const studentControllers = {
-  createStudent,
   getAllStudents,
   getSingleStudent,
   deleteSingleStudent,

@@ -1,7 +1,9 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import httpStatus from "http-status";
+import sendResponse from "../../utils/sendResponse";
 import { userServices } from "./user.service";
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { student: studentData, password } = req.body;
 
@@ -12,22 +14,14 @@ const createUser = async (req: Request, res: Response) => {
 
     const result = await userServices.createStudentToDB(password, studentData);
 
-    console.log(result);
-
-    res.status(200).json({
+    sendResponse(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Student created successfully",
       data: result,
     });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Something went wrong!",
-      error: {
-        code: 500,
-        description: error || "Something went wrong!",
-      },
-    });
+  } catch (error) {
+    next(error);
   }
 };
 

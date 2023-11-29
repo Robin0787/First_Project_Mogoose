@@ -1,15 +1,5 @@
 import { Student } from "./student.model";
 
-// const createStudentToDB = async (studentData: TStudent) => {
-//   // const result = await StudentModel.create(student);
-//   const student = new Student(studentData);
-//   if (await student.isUserExists(studentData.id)) {
-//     throw new Error("User already exists");
-//   }
-//   const result = await student.save();
-//   return result;
-// };
-
 const getAllStudents = async () => {
   const result = await Student.find();
   return result;

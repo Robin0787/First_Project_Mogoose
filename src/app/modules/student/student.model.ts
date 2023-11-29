@@ -116,19 +116,6 @@ studentSchema.virtual("fullName").get(function () {
   return `${this.name.firstName}  ${this.name.middleName} ${this.name.lastName}`;
 });
 
-// pre middleware for hashing user password.
-// studentSchema.pre("save", async function (next) {
-//   const user = this;
-//   user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt));
-//   next();
-// });
-
-// post middleware for hiding user password.
-studentSchema.post("save", async function (doc, next) {
-  doc.password = "";
-  next();
-});
-
 // Query Middleware
 studentSchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });

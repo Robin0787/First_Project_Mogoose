@@ -39,10 +39,11 @@ export interface TStudent {
   name: TStudentName;
   email: string;
   gender: TGender;
-  dateOfBirth: string;
+  dateOfBirth?: Date;
   contactNo: string;
   emergencyContactNo: string;
   academicDepartment: string;
+  admissionSemester: Types.ObjectId;
   bloodGroup?: BloodGroup;
   presentAddress: string;
   permanentAddress: string;

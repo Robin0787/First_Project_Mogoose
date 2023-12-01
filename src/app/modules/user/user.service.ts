@@ -11,6 +11,11 @@ const createStudentToDB = async (password: string, studentData: TStudent) => {
     password: password || (config.default_pass as string),
     role: "student",
   };
+
+  // const generateStudentId = (payload: TAcademicSemester) => {
+
+  // }
+
   // creating a user
   const createdUser = await User.create(userData);
 

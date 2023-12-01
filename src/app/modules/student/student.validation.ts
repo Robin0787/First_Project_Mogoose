@@ -1,57 +1,65 @@
-import Joi from "joi";
+import { z } from "zod";
 
-const studentNameValidationSchema = Joi.object({
-  firstName: Joi.string()
-    .required()
-    .trim()
-    .max(20)
-    .pattern(/^[A-Za-z]+$/)
-    .message("Only alphabetic characters are allowed in firstName"),
-  middleName: Joi.string().trim(),
-  lastName: Joi.string()
-    .required()
-    .trim()
-    .pattern(/^[A-Za-z]+$/)
-    .message("Only alphabetic characters are allowed in lastName"),
+const studentNameSchema = z.object({
+  firstName: z
+    .string()
+    .min(3, { message: "firstName must have minimum 3 characters" })
+    .max(20, { message: "firstName can't have more than 20 characters" })
+    .refine((value) => /^[A-Z]/.test(value), {
+      message: "firstName must start with a capital letter.",
+    }),
+  middleName: z.string().optional(),
+  lastName: z
+    .string()
+    .min(3, { message: "lastName must have minimum 3 characters" })
+    .max(20, { message: "lastName can't have more than 20 characters" }),
 });
 
-const guardianValidationSchema = Joi.object({
-  fatherName: Joi.string().required(),
-  fatherOccupation: Joi.string().required(),
-  fatherContactNo: Joi.string().required(),
+const guardianSchema = z.object({
+  fatherName: z.string(),
+  fatherOccupation: z.string(),
+  fatherContactNo: z.string(),
+  motherName: z.string(),
+  motherOccupation: z.string(),
+  motherContactNo: z.string(),
 });
 
-const localGuardianValidationSchema = Joi.object({
-  name: Joi.string().required(),
-  occupation: Joi.string().required(),
-  contactNo: Joi.string().required(),
-  address: Joi.string().required(),
+const localGuardianSchema = z.object({
+  name: z.string(),
+  occupation: z.string(),
+  contactNo: z.string(),
+  address: z.string(),
 });
 
-const studentValidationSchema = Joi.object({
-  id: Joi.string().required(),
-  name: studentNameValidationSchema.required(),
-  email: Joi.string().email().required(),
-  gender: Joi.string().valid("Male", "Female").required(),
-  dateOfBirth: Joi.string(),
-  contactNo: Joi.string().required(),
-  emergencyContactNo: Joi.string().required(),
-  bloodGroup: Joi.string().valid(
-    "A+",
-    "A-",
-    "B+",
-    "B-",
-    "O+",
-    "O-",
-    "AB+",
-    "AB-",
-  ),
-  presentAddress: Joi.string().required(),
-  permanentAddress: Joi.string().required(),
-  guardian: guardianValidationSchema.required(),
-  localGuardian: localGuardianValidationSchema.required(),
-  profileImage: Joi.string(),
-  isActive: Joi.string().valid("Active", "Blocked").default("Active"),
+const studentCreateValidationSchema = z.object({
+  body: z.object({
+    password: z
+      .string({
+        invalid_type_error: "password must be string",
+      })
+      .min(8, { message: "password must contain minimum of 8 characters." })
+      .max(16, { message: "password can contain 16 characters at max." })
+      .optional(),
+    student: z.object({
+      id: z.string(),
+      name: studentNameSchema,
+      email: z.string().email(),
+      gender: z.enum(["Male", "Female"]),
+      dateOfBirth: z.string().optional(),
+      contactNo: z.string(),
+      emergencyContactNo: z.string(),
+      academicDepartment: z.string(),
+      admissionSemester: z.string(),
+      bloodGroup: z.enum(["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"]),
+      presentAddress: z.string(),
+      permanentAddress: z.string(),
+      guardian: guardianSchema,
+      localGuardian: localGuardianSchema,
+      profileImage: z.string().optional(),
+    }),
+  }),
 });
 
-export default studentValidationSchema;
+export const studentValidations = {
+  studentCreateValidationSchema,
+};

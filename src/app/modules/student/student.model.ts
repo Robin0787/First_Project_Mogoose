@@ -82,10 +82,15 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>(
       },
       required: [true, "gender is required"],
     },
-    dateOfBirth: { type: String },
+    dateOfBirth: { type: Date },
     contactNo: { type: String, required: true },
     emergencyContactNo: { type: String, required: true },
     academicDepartment: { type: String, required: true },
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "AcademicSemester",
+    },
     bloodGroup: {
       type: String,
       enum: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],

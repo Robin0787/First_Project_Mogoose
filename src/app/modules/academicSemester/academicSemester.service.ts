@@ -15,7 +15,7 @@ const createAcademicSemesterToDB = async (
     academicSemesterNameCodeMapper[academicSemesterData.name] !==
     academicSemesterData.code
   ) {
-    throw new Error("Semester code is not valid!!");
+    throw new Error("Invalid semester code!!");
   }
 
   const result = await AcademicSemester.create(academicSemesterData);
@@ -34,8 +34,31 @@ const getSingleSemesterFromDB = async (semesterId: string) => {
   return result;
 };
 
+const updateSingleSemesterInDB = async (
+  semesterId: string,
+  semesterData: Partial<TAcademicSemester>,
+) => {
+  if (
+    semesterData.name &&
+    semesterData.code &&
+    academicSemesterNameCodeMapper[semesterData.name] !== semesterData.code
+  ) {
+    throw new Error("Invalid semester code!!");
+  }
+
+  const result = await AcademicSemester.updateOne(
+    {
+      _id: semesterId,
+    },
+    { $set: { ...semesterData } },
+    { new: true },
+  );
+  return result;
+};
+
 export const AcademicSemesterServices = {
   createAcademicSemesterToDB,
   getAllSemesterFromDB,
   getSingleSemesterFromDB,
+  updateSingleSemesterInDB,
 };

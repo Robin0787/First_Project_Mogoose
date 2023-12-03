@@ -9,7 +9,7 @@ import { generateStudentId } from "./user.utils";
 const createStudentToDB = async (password: string, payload: TStudent) => {
   // create user object
   const userData: Partial<TUser> = {
-    id: "2030100001",
+    id: "",
     password: password || (config.default_pass as string),
     role: "student",
   };
@@ -19,7 +19,7 @@ const createStudentToDB = async (password: string, payload: TStudent) => {
     payload.admissionSemester,
   );
   // setting users id
-  userData.id = generateStudentId(academicSemester);
+  userData.id = await generateStudentId(academicSemester);
 
   // creating a user
   const createdUser = await User.create(userData);

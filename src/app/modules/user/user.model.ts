@@ -8,6 +8,7 @@ const UserSchema = new Schema<TUser, UserModel, UserMethods>(
     id: {
       type: String,
       required: true,
+      unique: true,
     },
     password: {
       type: String,

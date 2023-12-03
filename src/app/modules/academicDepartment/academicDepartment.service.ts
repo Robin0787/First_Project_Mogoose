@@ -22,9 +22,10 @@ const updateAcademicDepartmentToDB = async (
   departmentId: string,
   departmentData: Partial<TAcademicDepartment>,
 ) => {
-  const result = await AcademicDepartment.updateOne(
+  const result = await AcademicDepartment.findByIdAndUpdate(
     { _id: departmentId },
     { ...departmentData },
+    { new: true },
   );
   return result;
 };

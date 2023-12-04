@@ -1,3 +1,5 @@
+import httpStatus from "http-status";
+import { AppError } from "../../errors/AppError";
 import { TAcademicDepartment } from "./academicDepartment.interface";
 import { AcademicDepartment } from "./academicDepartment.model";
 
@@ -15,7 +17,7 @@ const getAllAcademicDepartmentFromDB = async () => {
 
 const getSingleAcademicDepartmentFromDB = async (departmentId: string) => {
   if (!(await AcademicDepartment.isDepartmentExists(departmentId))) {
-    throw new Error("This Department doesn't exist!!");
+    throw new AppError(httpStatus.NOT_FOUND, "This Department doesn't exist!!");
   }
   const result =
     await AcademicDepartment.findById(departmentId).populate("academicFaculty");
@@ -27,7 +29,7 @@ const updateAcademicDepartmentToDB = async (
   departmentData: Partial<TAcademicDepartment>,
 ) => {
   if (!(await AcademicDepartment.isDepartmentExists(departmentId))) {
-    throw new Error("This Department doesn't exist!!");
+    throw new AppError(httpStatus.NOT_FOUND, "This Department doesn't exist!!");
   }
   const result = await AcademicDepartment.findByIdAndUpdate(
     { _id: departmentId },

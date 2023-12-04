@@ -12,7 +12,7 @@
     "lint:fix": "npx eslint src --fix",
     "prettier": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
     "prettier:fix": "npx prettier --write src",
-    "push-code": "git add . && git commit -m 'Updated' && git push"
+    "push-code": "git add . && git commit -m 'Updated' && git push && clear"
   },
   "keywords": [],
   "author": "",

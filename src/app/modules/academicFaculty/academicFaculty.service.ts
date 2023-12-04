@@ -12,6 +12,9 @@ const getAllAcademicFacultiesFromDB = async () => {
 };
 
 const getSingleAcademicFacultiesFromDB = async (facultyId: string) => {
+  if (!(await AcademicFaculty.isAcademicFacultyExists(facultyId))) {
+    throw new Error("This Faculty doesn't exist!!");
+  }
   const result = await AcademicFaculty.findById(facultyId);
   return result;
 };
@@ -20,6 +23,9 @@ const updateFacultyFromDB = async (
   facultyId: string,
   payload: TAcademicFaculty,
 ) => {
+  if (!(await AcademicFaculty.isAcademicFacultyExists(facultyId))) {
+    throw new Error("This Faculty doesn't exist!!");
+  }
   const result = await AcademicFaculty.updateOne(
     { _id: facultyId },
     { ...payload },

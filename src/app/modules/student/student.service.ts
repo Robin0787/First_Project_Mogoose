@@ -1,18 +1,36 @@
 import { Student } from "./student.model";
 
 const getAllStudents = async () => {
-  const result = await Student.find();
+  const result = await Student.find()
+    .populate("admissionSemester")
+    .populate({
+      path: "academicDepartment",
+      populate: {
+        path: "academicFaculty",
+      },
+    });
   return result;
 };
 
 const getSingleStudent = async (studentId: string) => {
-  // const result = await Student.findOne({ id: studentId });
-  // return result;
-  const result = await Student.aggregate([{ $match: { id: studentId } }]);
+  if (!(await Student.isStudentExists(studentId))) {
+    throw new Error("Student doesn't exist!!");
+  }
+  const result = await Student.findOne({ id: studentId })
+    .populate("admissionSemester")
+    .populate({
+      path: "academicDepartment",
+      populate: {
+        path: "academicFaculty",
+      },
+    });
   return result;
 };
 
 const deleteSingleStudentFromDB = async (studentId: string) => {
+  if (!(await Student.isStudentExists(studentId))) {
+    throw new Error("Student doesn't exist!!");
+  }
   const result = await Student.updateOne(
     { id: studentId },
     { $set: { isDeleted: true } },

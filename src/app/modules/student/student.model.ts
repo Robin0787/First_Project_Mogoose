@@ -2,7 +2,6 @@ import { Schema, model } from "mongoose";
 
 import validator from "validator";
 import {
-  StudentMethods,
   StudentModel,
   TGuardian,
   TLocalGuardian,
@@ -52,14 +51,14 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
   address: { type: String, required: true },
 });
 
-const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>(
+const studentSchema = new Schema<TStudent, StudentModel>(
   {
     id: { type: String, required: true },
     user: {
       type: Schema.Types.ObjectId,
       required: true,
       unique: true,
-      ref: "User",
+      ref: "user",
     },
     name: {
       type: studentNameSchema,
@@ -85,11 +84,15 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>(
     dateOfBirth: { type: Date },
     contactNo: { type: String, required: true },
     emergencyContactNo: { type: String, required: true },
-    academicDepartment: { type: String, required: true },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "academicDepartment",
+    },
     admissionSemester: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "AcademicSemester",
+      ref: "academicSemester",
     },
     bloodGroup: {
       type: String,
@@ -137,7 +140,7 @@ studentSchema.pre("aggregate", function (next) {
   next();
 });
 
-studentSchema.methods.isUserExists = async function (id: string) {
+studentSchema.statics.isStudentExists = async function (id: string) {
   const existingUser = await Student.findOne({ id });
   return existingUser;
 };

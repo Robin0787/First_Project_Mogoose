@@ -1,7 +1,13 @@
 import { Schema, model } from "mongoose";
-import { TAcademicDepartment } from "./academicDepartment.interface";
+import {
+  AcademicDepartmentModel,
+  TAcademicDepartment,
+} from "./academicDepartment.interface";
 
-const academicDepartmentSchema = new Schema<TAcademicDepartment>({
+const academicDepartmentSchema = new Schema<
+  TAcademicDepartment,
+  AcademicDepartmentModel
+>({
   name: {
     type: String,
     unique: true,
@@ -22,24 +28,13 @@ academicDepartmentSchema.pre("save", async function (next) {
   }
   next();
 });
-academicDepartmentSchema.pre("findOneAndUpdate", async function (next) {
-  const query = this.getQuery();
-  const isDepartmentExists = await AcademicDepartment.findOne(query);
-  if (!isDepartmentExists) {
-    throw new Error("This department doesn't exist");
-  }
-  next();
-});
-academicDepartmentSchema.pre("findOne", async function (next) {
-  const query = this.getQuery();
-  const isDepartmentExists = await AcademicDepartment.findOne(query);
-  if (!isDepartmentExists) {
-    throw new Error("This department doesn't exist");
-  }
-  next();
-});
 
-export const AcademicDepartment = model<TAcademicDepartment>(
-  "academicDepartment",
-  academicDepartmentSchema,
-);
+academicDepartmentSchema.statics.isDepartmentExists = async (id: string) => {
+  const result = await AcademicDepartment.findById(id);
+  return result;
+};
+
+export const AcademicDepartment = model<
+  TAcademicDepartment,
+  AcademicDepartmentModel
+>("academicDepartment", academicDepartmentSchema);

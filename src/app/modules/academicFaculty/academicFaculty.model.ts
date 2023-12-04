@@ -1,7 +1,13 @@
 import { Schema, model } from "mongoose";
-import { TAcademicFaculty } from "./academicFaculty.interface";
+import {
+  AcademicFacultyModel,
+  TAcademicFaculty,
+} from "./academicFaculty.interface";
 
-const academicFacultySchema = new Schema<TAcademicFaculty>({
+const academicFacultySchema = new Schema<
+  TAcademicFaculty,
+  AcademicFacultyModel
+>({
   name: {
     type: String,
     required: true,
@@ -9,7 +15,12 @@ const academicFacultySchema = new Schema<TAcademicFaculty>({
   },
 });
 
-export const AcademicFaculty = model<TAcademicFaculty>(
+academicFacultySchema.statics.isAcademicFacultyExists = async (id: string) => {
+  const result = await AcademicFaculty.findById(id);
+  return result;
+};
+
+export const AcademicFaculty = model<TAcademicFaculty, AcademicFacultyModel>(
   "academicFaculty",
   academicFacultySchema,
 );

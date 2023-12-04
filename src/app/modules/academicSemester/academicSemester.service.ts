@@ -28,6 +28,9 @@ const getAllSemesterFromDB = async () => {
 };
 
 const getSingleSemesterFromDB = async (semesterId: string) => {
+  if (!(await AcademicSemester.isAcademicSemesterExists(semesterId))) {
+    throw new Error("This Semester doesn't exist!!");
+  }
   const result = await AcademicSemester.findOne({
     _id: semesterId,
   });
@@ -38,6 +41,9 @@ const updateSingleSemesterInDB = async (
   semesterId: string,
   semesterData: Partial<TAcademicSemester>,
 ) => {
+  if (!(await AcademicSemester.isAcademicSemesterExists(semesterId))) {
+    throw new Error("This Semester doesn't exist!!");
+  }
   if (
     semesterData.name &&
     semesterData.code &&

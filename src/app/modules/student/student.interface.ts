@@ -42,7 +42,7 @@ export interface TStudent {
   dateOfBirth?: Date;
   contactNo: string;
   emergencyContactNo: string;
-  academicDepartment: string;
+  academicDepartment: Types.ObjectId;
   admissionSemester: Types.ObjectId;
   bloodGroup?: BloodGroup;
   presentAddress: string;
@@ -53,12 +53,6 @@ export interface TStudent {
   isDeleted?: boolean;
 }
 
-export type StudentMethods = {
-  isUserExists(id: string): Promise<TStudent | null>;
-};
-
-export type StudentModel = Model<
-  TStudent,
-  Record<string, never>,
-  StudentMethods
->;
+export interface StudentModel extends Model<TStudent> {
+  isStudentExists(id: string): Promise<TStudent | null>;
+}

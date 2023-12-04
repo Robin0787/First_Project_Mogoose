@@ -4,9 +4,15 @@ import {
   AcademicSemesterMonths,
   AcademicSemesterNames,
 } from "./academicSemester.constant";
-import { TAcademicSemester } from "./academicSemester.interface";
+import {
+  AcademicSemesterModel,
+  TAcademicSemester,
+} from "./academicSemester.interface";
 
-const AcademicSemesterSchema = new Schema<TAcademicSemester>(
+const AcademicSemesterSchema = new Schema<
+  TAcademicSemester,
+  AcademicSemesterModel
+>(
   {
     name: { type: String, enum: AcademicSemesterNames, required: true },
     code: {
@@ -37,7 +43,14 @@ AcademicSemesterSchema.pre("save", async function (next) {
   next();
 });
 
-export const AcademicSemester = model<TAcademicSemester>(
-  "AcademicSemester",
+AcademicSemesterSchema.statics.isAcademicSemesterExists = async (
+  id: string,
+) => {
+  const result = await AcademicSemester.findById(id);
+  return result;
+};
+
+export const AcademicSemester = model<TAcademicSemester, AcademicSemesterModel>(
+  "academicSemester",
   AcademicSemesterSchema,
 );

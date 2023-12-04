@@ -1,3 +1,5 @@
+import { Model } from "mongoose";
+
 export type TAcademicSemesterMonths =
   | "January"
   | "February"
@@ -22,3 +24,7 @@ export type TAcademicSemester = {
   startMonth: TAcademicSemesterMonths;
   endMonth: TAcademicSemesterMonths;
 };
+
+export interface AcademicSemesterModel extends Model<TAcademicSemester> {
+  isAcademicSemesterExists(id: string): Promise<TAcademicSemester | null>;
+}

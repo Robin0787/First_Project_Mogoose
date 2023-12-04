@@ -9,12 +9,16 @@ const createAcademicDepartmentToDB = async (
 };
 
 const getAllAcademicDepartmentFromDB = async () => {
-  const result = await AcademicDepartment.find({});
+  const result = await AcademicDepartment.find({}).populate("academicFaculty");
   return result;
 };
 
 const getSingleAcademicDepartmentFromDB = async (departmentId: string) => {
-  const result = await AcademicDepartment.findById(departmentId);
+  if (!(await AcademicDepartment.isDepartmentExists(departmentId))) {
+    throw new Error("This Department doesn't exist!!");
+  }
+  const result =
+    await AcademicDepartment.findById(departmentId).populate("academicFaculty");
   return result;
 };
 
@@ -22,6 +26,9 @@ const updateAcademicDepartmentToDB = async (
   departmentId: string,
   departmentData: Partial<TAcademicDepartment>,
 ) => {
+  if (!(await AcademicDepartment.isDepartmentExists(departmentId))) {
+    throw new Error("This Department doesn't exist!!");
+  }
   const result = await AcademicDepartment.findByIdAndUpdate(
     { _id: departmentId },
     { ...departmentData },

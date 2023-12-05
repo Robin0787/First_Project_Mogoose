@@ -1,3 +1,5 @@
+import httpStatus from "http-status";
+import { AppError } from "../../errors/AppError";
 import { Student } from "./student.model";
 
 const getAllStudents = async () => {
@@ -14,7 +16,7 @@ const getAllStudents = async () => {
 
 const getSingleStudent = async (studentId: string) => {
   if (!(await Student.isStudentExists(studentId))) {
-    throw new Error("Student doesn't exist!!");
+    throw new AppError(httpStatus.NOT_FOUND, "Student doesn't exist!!");
   }
   const result = await Student.findOne({ id: studentId })
     .populate("admissionSemester")
@@ -29,7 +31,7 @@ const getSingleStudent = async (studentId: string) => {
 
 const deleteSingleStudentFromDB = async (studentId: string) => {
   if (!(await Student.isStudentExists(studentId))) {
-    throw new Error("Student doesn't exist!!");
+    throw new AppError(httpStatus.NOT_FOUND, "Student doesn't exist!!");
   }
   const result = await Student.updateOne(
     { id: studentId },

@@ -1,3 +1,5 @@
+import httpStatus from "http-status";
+import { AppError } from "../../errors/AppError";
 import { TAcademicFaculty } from "./academicFaculty.interface";
 import { AcademicFaculty } from "./academicFaculty.model";
 
@@ -13,7 +15,7 @@ const getAllAcademicFacultiesFromDB = async () => {
 
 const getSingleAcademicFacultiesFromDB = async (facultyId: string) => {
   if (!(await AcademicFaculty.isAcademicFacultyExists(facultyId))) {
-    throw new Error("This Faculty doesn't exist!!");
+    throw new AppError(httpStatus.NOT_FOUND, "This Faculty doesn't exist!!");
   }
   const result = await AcademicFaculty.findById(facultyId);
   return result;
@@ -24,7 +26,7 @@ const updateFacultyFromDB = async (
   payload: TAcademicFaculty,
 ) => {
   if (!(await AcademicFaculty.isAcademicFacultyExists(facultyId))) {
-    throw new Error("This Faculty doesn't exist!!");
+    throw new AppError(httpStatus.NOT_FOUND, "This Faculty doesn't exist!!");
   }
   const result = await AcademicFaculty.updateOne(
     { _id: facultyId },

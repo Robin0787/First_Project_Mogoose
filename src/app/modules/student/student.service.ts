@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import mongoose from "mongoose";
 import { AppError } from "../../errors/AppError";
 import { User } from "../user/user.model";
+import { TStudent } from "./student.interface";
 import { Student } from "./student.model";
 
 const getAllStudents = async () => {
@@ -28,6 +29,14 @@ const getSingleStudent = async (id: string) => {
         path: "academicFaculty",
       },
     });
+  return result;
+};
+
+const updatedStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
+  if (!(await Student.isStudentExists(id))) {
+    throw new AppError(httpStatus.NOT_FOUND, "Student doesn't exist!!");
+  }
+  const result = await Student.findOneAndUpdate({ id }, payload);
   return result;
 };
 
@@ -74,5 +83,6 @@ const deleteSingleStudentFromDB = async (id: string) => {
 export const studentServices = {
   getAllStudents,
   getSingleStudent,
+  updatedStudentIntoDB,
   deleteSingleStudentFromDB,
 };

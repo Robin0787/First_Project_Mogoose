@@ -49,7 +49,10 @@ const createStudentToDB = async (password: string, payload: TStudent) => {
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new AppError(httpStatus.BAD_REQUEST, "Something went wrong!");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      err.message || "Something went wrong!!",
+    );
   }
 };
 

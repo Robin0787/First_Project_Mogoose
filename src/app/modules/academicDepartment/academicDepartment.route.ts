@@ -7,9 +7,9 @@ const router = Router();
 
 router.post(
   "/create-academic-department",
-  validateRequest(
-    academicDepartmentValidations.academicDepartmentCreateValidationSchema,
-  ),
+  // validateRequest(
+  //   academicDepartmentValidations.academicDepartmentCreateValidationSchema,
+  // ),
   academicDepartmentControllers.createAcademicDepartment,
 );
 

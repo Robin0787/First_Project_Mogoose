@@ -49,11 +49,13 @@ const updatedStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
       modifiedUpdatedData[`name.${key}`] = value;
     }
   }
+
   if (guardian && Object.keys(guardian).length) {
     for (const [key, value] of Object.entries(guardian)) {
       modifiedUpdatedData[`guardian.${key}`] = value;
     }
   }
+
   if (localGuardian && Object.keys(localGuardian).length) {
     for (const [key, value] of Object.entries(localGuardian)) {
       modifiedUpdatedData[`localGuardian.${key}`] = value;

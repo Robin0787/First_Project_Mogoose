@@ -1,6 +1,7 @@
 "use strict";
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
+import httpStatus from "http-status";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import notFoundRoute from "./app/middlewares/notFoundRoute";
 import router from "./app/routes";
@@ -14,8 +15,11 @@ app.use(cors());
 app.use("/api/v1", router);
 
 app.get("/", async (req: Request, res: Response) => {
-  Promise.reject();
-  res.send("Hello World!");
+  res.send({
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Welcome to PH University server!!",
+  });
 });
 
 // global error handler

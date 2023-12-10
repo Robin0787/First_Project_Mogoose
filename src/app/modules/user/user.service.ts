@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import config from "../../config";
 import { AppError } from "../../errors/AppError";
 import { AcademicSemester } from "../academicSemester/academicSemester.model";
+import { TFaculty } from "../faculty/faculty.interface";
 import { TStudent } from "../student/student.interface";
 import { Student } from "../student/student.model";
 import { TUser } from "./user.interface";
@@ -56,6 +57,19 @@ const createStudentToDB = async (password: string, payload: TStudent) => {
   }
 };
 
+const createFacultyToDB = async (password: string, payload: TFaculty) => {
+  // create user object
+  const userData: Partial<TUser> = {
+    id: "",
+    password: password || (config.default_pass as string),
+    role: "faculty",
+  };
+
+  console.log(password);
+  return payload;
+};
+
 export const userServices = {
   createStudentToDB,
+  createFacultyToDB,
 };

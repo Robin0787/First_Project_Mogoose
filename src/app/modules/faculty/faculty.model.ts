@@ -1,5 +1,35 @@
 import { Schema, model } from "mongoose";
-import { TFaculty } from "./faculty.interface";
+import validator from "validator";
+import { TFaculty, TFacultyName } from "./faculty.interface";
+
+const facultyNameSchema = new Schema<TFacultyName>({
+  firstName: {
+    type: String,
+    required: [true, "firstName is required"],
+    trim: true,
+    maxLength: [20, "firstName can't be more than 20 characters"],
+    validate: {
+      validator: function (value: string) {
+        const formateValue = value.split(" ").join("");
+        const capitalizedValue =
+          formateValue.charAt(0).toUpperCase() +
+          formateValue.slice(1).toLowerCase();
+        return capitalizedValue === value;
+      },
+      message: "{VALUE} is not in capitalize format like 'Robin'",
+    },
+  },
+  middleName: { type: String, trim: true },
+  lastName: {
+    type: String,
+    required: [true, "lastName is required"],
+    trim: true,
+    validate: {
+      validator: (value: string) => validator.isAlpha(value),
+      message: "{VALUE} is not valid.",
+    },
+  },
+});
 
 const facultySchema = new Schema<TFaculty>(
   {
@@ -7,8 +37,14 @@ const facultySchema = new Schema<TFaculty>(
       type: String,
       required: true,
     },
+    user: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+      ref: "user",
+    },
     name: {
-      type: String,
+      type: facultyNameSchema,
       required: true,
     },
     designation: {
@@ -18,6 +54,7 @@ const facultySchema = new Schema<TFaculty>(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     gender: {
       type: String,
@@ -39,10 +76,12 @@ const facultySchema = new Schema<TFaculty>(
     academicDepartment: {
       type: Schema.Types.ObjectId,
       required: true,
+      refs: "academicDepartment",
     },
     academicFaculty: {
       type: Schema.Types.ObjectId,
       required: true,
+      refs: "academicFaculty",
     },
     bloodGroup: {
       type: String,

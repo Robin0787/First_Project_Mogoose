@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 
 import validator from "validator";
+
 import {
   StudentModel,
   TGuardian,

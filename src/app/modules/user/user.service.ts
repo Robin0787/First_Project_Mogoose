@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import mongoose from "mongoose";
 import config from "../../config";
 import { AppError } from "../../errors/AppError";
+import { AcademicDepartment } from "../academicDepartment/academicDepartment.model";
 import { AcademicSemester } from "../academicSemester/academicSemester.model";
 import { TFaculty } from "../faculty/faculty.interface";
 import { Faculty } from "../faculty/faculty.model";
@@ -66,6 +67,15 @@ const createFacultyToDB = async (password: string, payload: TFaculty) => {
     role: "faculty",
   };
 
+  // find academic department info
+  const academicDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  );
+
+  if (!academicDepartment) {
+    throw new AppError(400, "Academic department not found");
+  }
+
   const session = await mongoose.startSession();
 
   try {
@@ -77,6 +87,7 @@ const createFacultyToDB = async (password: string, payload: TFaculty) => {
     const createdFacultyUser = await User.create([userData], { session });
 
     if (!createdFacultyUser.length) {
+      console.log(createdFacultyUser);
       throw new AppError(httpStatus.BAD_REQUEST, "Failed to create user!!");
     }
 

@@ -39,7 +39,7 @@ const getLastFacultyId = async () => {
   return lastFaculty?.id ? lastFaculty.id : undefined;
 };
 
-export const generateFacultyId = async (): Promise<string> => {
+export const generateFacultyId = async () => {
   let currentFacultyId = (0).toString();
 
   const lastFacultyId = await getLastFacultyId();
@@ -52,8 +52,6 @@ export const generateFacultyId = async (): Promise<string> => {
   const incrementedFacultyId = (Number(currentFacultyId) + 1)
     .toString()
     .padStart(4, "0");
-
-  console.log({ lastFacultyId, incrementedFacultyId });
 
   return `F-${incrementedFacultyId}`;
 };

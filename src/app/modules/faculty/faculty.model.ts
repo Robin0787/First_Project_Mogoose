@@ -53,8 +53,8 @@ const facultySchema = new Schema<TFaculty>(
     },
     email: {
       type: String,
-      required: true,
       unique: true,
+      required: true,
     },
     gender: {
       type: String,

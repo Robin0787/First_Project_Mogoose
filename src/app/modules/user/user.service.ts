@@ -87,7 +87,6 @@ const createFacultyToDB = async (password: string, payload: TFaculty) => {
     const createdFacultyUser = await User.create([userData], { session });
 
     if (!createdFacultyUser.length) {
-      console.log(createdFacultyUser);
       throw new AppError(httpStatus.BAD_REQUEST, "Failed to create user!!");
     }
 

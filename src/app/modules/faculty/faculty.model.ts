@@ -76,12 +76,12 @@ const facultySchema = new Schema<TFaculty>(
     academicDepartment: {
       type: Schema.Types.ObjectId,
       required: true,
-      refs: "academicDepartment",
+      ref: "academicDepartment",
     },
     academicFaculty: {
       type: Schema.Types.ObjectId,
       required: true,
-      refs: "academicFaculty",
+      ref: "academicFaculty",
     },
     bloodGroup: {
       type: String,

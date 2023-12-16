@@ -55,3 +55,27 @@ export const generateFacultyId = async () => {
 
   return `F-${incrementedFacultyId}`;
 };
+
+const getLastAdminId = async () => {
+  const lastAdmin = await User.findOne({ role: "admin" }, { id: 1, _id: 0 })
+    .sort({ createdAt: -1 })
+    .lean();
+  return lastAdmin?.id ? lastAdmin.id : undefined;
+};
+
+export const generateAdminId = async () => {
+  let currentAdminId = (0).toString();
+
+  const lastAdminId = await getLastAdminId();
+
+  if (lastAdminId) {
+    const lastAdminIdOnlyDigit = Number(lastAdminId?.substring(2));
+    currentAdminId = lastAdminIdOnlyDigit.toString();
+  }
+
+  const incrementedAdminId = (Number(currentAdminId) + 1)
+    .toString()
+    .padStart(4, "0");
+
+  return `A-${incrementedAdminId}`;
+};

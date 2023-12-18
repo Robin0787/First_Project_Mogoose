@@ -141,8 +141,8 @@ studentSchema.pre("aggregate", function (next) {
   next();
 });
 
-studentSchema.statics.isStudentExists = async function (id: string) {
-  const existingUser = await Student.findOne({ id });
+studentSchema.statics.isStudentExists = async function (_id: string) {
+  const existingUser = await Student.findById(_id);
   return existingUser;
 };
 

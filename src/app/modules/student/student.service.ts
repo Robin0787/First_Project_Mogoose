@@ -92,11 +92,11 @@ const getAllStudents = async (query: Record<string, unknown>) => {
   return result;
 };
 
-const getSingleStudent = async (id: string) => {
-  if (!(await Student.isStudentExists(id))) {
+const getSingleStudent = async (_id: string) => {
+  if (!(await Student.isStudentExists(_id))) {
     throw new AppError(httpStatus.NOT_FOUND, "Student doesn't exist!!");
   }
-  const result = await Student.findOne({ id })
+  const result = await Student.findById(_id)
     .populate("admissionSemester")
     .populate({
       path: "academicDepartment",
@@ -107,8 +107,11 @@ const getSingleStudent = async (id: string) => {
   return result;
 };
 
-const updatedStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
-  if (!(await Student.isStudentExists(id))) {
+const updatedStudentIntoDB = async (
+  _id: string,
+  payload: Partial<TStudent>,
+) => {
+  if (!(await Student.isStudentExists(_id))) {
     throw new AppError(httpStatus.NOT_FOUND, "Student doesn't exist!!");
   }
   // change the student data to don't mutate in Database
@@ -137,15 +140,15 @@ const updatedStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
     }
   }
 
-  const result = await Student.findOneAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Student.findByIdAndUpdate(_id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
   return result;
 };
 
-const deleteSingleStudentFromDB = async (id: string) => {
-  if (!(await Student.isStudentExists(id))) {
+const deleteSingleStudentFromDB = async (_id: string) => {
+  if (!(await Student.isStudentExists(_id))) {
     throw new AppError(httpStatus.NOT_FOUND, "Student doesn't exist!!");
   }
 
@@ -154,8 +157,8 @@ const deleteSingleStudentFromDB = async (id: string) => {
   try {
     session.startTransaction();
 
-    const deletedStudent = await Student.findOneAndUpdate(
-      { id },
+    const deletedStudent = await Student.findByIdAndUpdate(
+      _id,
       { isDeleted: true },
       { new: true, session },
     );
@@ -164,23 +167,28 @@ const deleteSingleStudentFromDB = async (id: string) => {
       throw new AppError(httpStatus.BAD_REQUEST, "Failed to delete student!");
     }
 
-    const deletedUser = await User.findOneAndUpdate(
-      { id },
+    const userId = deletedStudent.user;
+
+    const deletedUser = await User.findByIdAndUpdate(
+      userId,
       { isDeleted: true },
       { new: true, session },
     );
 
     if (!deletedUser) {
-      throw new AppError(httpStatus.BAD_REQUEST, "Failed to delete user!");
+      throw new AppError(httpStatus.BAD_REQUEST, "Failed to delete student!");
     }
 
     await session.commitTransaction();
     await session.endSession();
     return deletedStudent;
-  } catch (error) {
+  } catch (error: any) {
     session.abortTransaction();
     session.endSession();
-    throw new AppError(httpStatus.BAD_REQUEST, "Something went wrong!!");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      error.message || "Failed to delete student!",
+    );
   }
 };
 

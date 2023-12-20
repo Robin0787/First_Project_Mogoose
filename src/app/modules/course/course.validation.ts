@@ -19,25 +19,23 @@ const courseCreateValidationSchema = z.object({
   }),
 });
 
-// const courseUpdateValidationSchema = z.object({
-//   body: z.object({
-//     course: z.object({
-//       title: z.string().optional(),
-//       prefix: z.string().optional(),
-//       code: z.number().optional(),
-//       credits: z.number().optional(),
-//       preRequisiteCourses: z
-//         .object({
-//           course: z.string().optional(),
-//           isDeleted: z.boolean().optional(),
-//         })
-//         .array()
-//         .optional(),
-//     }),
-//   }),
-// });
-
-const courseUpdateValidationSchema = courseCreateValidationSchema.partial();
+const courseUpdateValidationSchema = z.object({
+  body: z.object({
+    course: z.object({
+      title: z.string().optional(),
+      prefix: z.string().optional(),
+      code: z.number().optional(),
+      credits: z.number().optional(),
+      preRequisiteCourses: z
+        .object({
+          course: z.string().optional(),
+          isDeleted: z.boolean().optional(),
+        })
+        .array()
+        .optional(),
+    }),
+  }),
+});
 
 export const courseValidationSchemas = {
   courseCreateValidationSchema,

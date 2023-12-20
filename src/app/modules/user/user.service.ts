@@ -107,12 +107,12 @@ const createFacultyToDB = async (password: string, payload: TFaculty) => {
     if (!createdFaculty.length) {
       throw new AppError(httpStatus.BAD_REQUEST, "Failed to create Faculty!!");
     }
-    session.commitTransaction();
-    session.endSession();
+    await session.commitTransaction();
+    await session.endSession();
     return createdFaculty;
   } catch (err: any) {
-    session.abortTransaction();
-    session.endSession();
+    await session.abortTransaction();
+    await session.endSession();
     throw new AppError(
       httpStatus.BAD_REQUEST,
       err.message || "Something went wrong!!",

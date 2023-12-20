@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { AppError } from "../../errors/AppError";
 import { courseSearchableFields } from "./course.constant";
-import { TCourse } from "./course.interface";
-import { Course } from "./course.model";
+import { TCourse, TCourseFaculties } from "./course.interface";
+import { Course, CourseFaculty } from "./course.model";
 
 const createCourseIntoDB = async (payload: TCourse) => {
   const result = await Course.create(payload);
@@ -118,10 +118,53 @@ const updatedSingleCourseIntoDB = async (
   }
 };
 
+const assignFacultiesToCourseIntoDB = async (
+  id: string,
+  payload: Partial<TCourseFaculties>,
+) => {
+  if (!(await Course.findById(id))) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Course doesn't exist");
+  }
+
+  const result = await CourseFaculty.findByIdAndUpdate(
+    id,
+    {
+      course: id,
+      $addToSet: {
+        faculties: { $each: payload },
+      },
+    },
+    { upsert: true, new: true },
+  );
+  return result;
+};
+
+const removeFacultiesFromCourseIntoDB = async (
+  id: string,
+  payload: Partial<TCourseFaculties>,
+) => {
+  if (!(await Course.findById(id))) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Course doesn't exist");
+  }
+
+  const result = await CourseFaculty.findByIdAndUpdate(
+    id,
+    {
+      $pull: {
+        faculties: { $in: payload },
+      },
+    },
+    { new: true },
+  );
+  return result;
+};
+
 export const courseServices = {
   createCourseIntoDB,
   getAllCoursesFromDB,
   getSingleCourseFromDB,
   deleteSingleCourseFromDB,
   updatedSingleCourseIntoDB,
+  assignFacultiesToCourseIntoDB,
+  removeFacultiesFromCourseIntoDB,
 };

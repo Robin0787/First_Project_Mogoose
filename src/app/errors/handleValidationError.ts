@@ -14,7 +14,12 @@ const handleValidationError = (
         message: val.message,
       };
     },
-  );
+  ) as [
+    {
+      path: string;
+      message: string;
+    },
+  ];
   const statusCode = 400;
   return {
     statusCode,

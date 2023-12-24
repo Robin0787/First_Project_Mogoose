@@ -17,11 +17,13 @@ router.post(
   offeredCourseControllers.createOfferedCourse,
 );
 
-// router.patch(
-//   '/:id',
-//   validateRequest(offeredCourseValidationSchemas.offeredCourseUpdateValidationSchema),
-//   ,
-// );
+router.patch(
+  "/:id",
+  validateRequest(
+    offeredCourseValidationSchemas.offeredCourseUpdateValidationSchema,
+  ),
+  offeredCourseControllers.updateOfferedCourse,
+);
 
 // router.delete(
 //   '/:id',

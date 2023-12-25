@@ -4,6 +4,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
 import { AppError } from "../errors/AppError";
 import { TUserRole } from "../modules/user/user.interface";
+import { User } from "../modules/user/user.model";
 import catchAsync from "../utils/catchAsync";
 
 const auth = (...requiredRoles: TUserRole[]) => {
@@ -16,29 +17,36 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     // check the token is valid or not
-    jwt.verify(
+    const decoded = jwt.verify(
       token,
       config.jwt_access_secret as string,
-      function (err, decoded) {
-        if (err) {
-          throw new AppError(
-            httpStatus.UNAUTHORIZED,
-            "You are not authorized!",
-          );
-        }
-        const role = (decoded as JwtPayload).role;
-        if (requiredRoles && !requiredRoles.includes(role)) {
-          console.log({ requiredRoles, decodedRole: role });
-          throw new AppError(
-            httpStatus.UNAUTHORIZED,
-            "You are not authorized!",
-          );
-        }
+    ) as JwtPayload;
 
-        req.user = decoded as JwtPayload;
-        next();
-      },
-    );
+    const { id, role, iat } = decoded;
+
+    // check the user exist or not
+    const user = await User.isUserExistsByCustomId(id);
+
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, "This User is not found!");
+    }
+
+    // check the user is deleted or not
+    if (user.isDeleted) {
+      throw new AppError(httpStatus.FORBIDDEN, "This User is deleted!");
+    }
+
+    // check the user is blocked or not
+    if (user.status === "blocked") {
+      throw new AppError(httpStatus.FORBIDDEN, "This User is blocked!");
+    }
+
+    if (requiredRoles.length > 0 && !requiredRoles.includes(role)) {
+      console.log({ requiredRoles, decodedRole: role });
+      throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
+    }
+    req.user = decoded as JwtPayload;
+    next();
   });
 };
 export default auth;

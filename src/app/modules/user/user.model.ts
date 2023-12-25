@@ -13,10 +13,15 @@ const UserSchema = new Schema<TUser, UserModel>(
     password: {
       type: String,
       required: true,
+      select: 0,
     },
     needsPasswordChange: {
       type: Boolean,
       default: true,
+    },
+    passwordChangedAt: {
+      type: Date,
+      required: false,
     },
     role: {
       type: String,
@@ -45,7 +50,7 @@ const UserSchema = new Schema<TUser, UserModel>(
 );
 
 UserSchema.statics.isUserExistsByCustomId = async function (id: string) {
-  const result = await User.findOne({ id });
+  const result = await User.findOne({ id }).select("+password");
   return result;
 };
 
@@ -58,6 +63,12 @@ UserSchema.statics.isPasswordCorrect = async function (
     .then((result) => {
       return result;
     });
+};
+UserSchema.statics.isJWTIssuedBeforePasswordChanged = async function (
+  passwordChangedTimeStamp: Date,
+  JWTIssuedTimeStamp: number,
+) {
+  // return passwordChangedTimeStamp > JWTIssuedTimeStamp;
 };
 
 // pre middleware for hashing user password.

@@ -11,13 +11,14 @@ const router = express.Router();
 
 router.post(
   "/create-student",
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.faculty),
   validateRequest(studentValidations.studentCreateValidationSchema),
   userControllers.createUser,
 );
 
 router.post(
   "/create-faculty",
+  auth(USER_ROLE.admin),
   validateRequest(facultyValidations.facultyCreateValidationSchema),
   userControllers.createFaculty,
 );

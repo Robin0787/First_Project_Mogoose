@@ -1,16 +1,21 @@
 import { Model } from "mongoose";
+import { USER_ROLE } from "./user.constant";
 
-export type TUser = {
+export type TUserRole = keyof typeof USER_ROLE;
+
+export interface TUser {
   id: string;
   password: string;
   needsPasswordChange?: boolean;
   role: "admin" | "faculty" | "student";
   status: "in-progress" | "blocked";
   isDeleted: boolean;
-};
+}
 
-export type UserMethods = {
-  isUserExists(userId: string): Promise<TUser | null>;
-};
-
-export type UserModel = Model<TUser, Record<string, never>, UserMethods>;
+export interface UserModel extends Model<TUser> {
+  isUserExistsByCustomId(userId: string): Promise<TUser | null>;
+  isPasswordCorrect(
+    plainTextPassword: string,
+    hashedPassword: string,
+  ): Promise<Boolean>;
+}

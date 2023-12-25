@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import { Schema, model } from "mongoose";
 import config from "../../config";
-import { TUser, UserMethods, UserModel } from "./user.interface";
+import { TUser, UserModel } from "./user.interface";
 
-const UserSchema = new Schema<TUser, UserModel, UserMethods>(
+const UserSchema = new Schema<TUser, UserModel>(
   {
     id: {
       type: String,
@@ -44,9 +44,20 @@ const UserSchema = new Schema<TUser, UserModel, UserMethods>(
   },
 );
 
-UserSchema.methods.isUserExists = async function (id) {
+UserSchema.statics.isUserExistsByCustomId = async function (id: string) {
   const result = await User.findOne({ id });
   return result;
+};
+
+UserSchema.statics.isPasswordCorrect = async function (
+  plainTextPassword: string,
+  hashedPassword: string,
+) {
+  return await bcrypt
+    .compare(plainTextPassword, hashedPassword)
+    .then((result) => {
+      return result;
+    });
 };
 
 // pre middleware for hashing user password.

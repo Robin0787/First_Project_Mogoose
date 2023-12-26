@@ -40,6 +40,19 @@ const auth = (...requiredRoles: TUserRole[]) => {
     if (user.status === "blocked") {
       throw new AppError(httpStatus.FORBIDDEN, "This User is blocked!");
     }
+    // check if the passwordChangeAt is bigger than jwtIssuedAt
+    if (
+      user.passwordChangedAt &&
+      User.isJWTIssuedBeforePasswordChanged(
+        user.passwordChangedAt,
+        iat as number,
+      )
+    ) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "Your password has changed! Please login again..",
+      );
+    }
 
     if (requiredRoles.length > 0 && !requiredRoles.includes(role)) {
       console.log({ requiredRoles, decodedRole: role });

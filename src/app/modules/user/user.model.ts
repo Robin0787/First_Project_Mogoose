@@ -64,11 +64,14 @@ UserSchema.statics.isPasswordCorrect = async function (
       return result;
     });
 };
-UserSchema.statics.isJWTIssuedBeforePasswordChanged = async function (
+
+UserSchema.statics.isJWTIssuedBeforePasswordChanged = function (
   passwordChangedTimeStamp: Date,
   JWTIssuedTimeStamp: number,
 ) {
-  // return passwordChangedTimeStamp > JWTIssuedTimeStamp;
+  const passwordChangedTime =
+    new Date(passwordChangedTimeStamp).getTime() / 1000;
+  return passwordChangedTime > JWTIssuedTimeStamp;
 };
 
 // pre middleware for hashing user password.

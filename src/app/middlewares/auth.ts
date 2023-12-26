@@ -40,6 +40,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     if (user.status === "blocked") {
       throw new AppError(httpStatus.FORBIDDEN, "This User is blocked!");
     }
+
     // check if the passwordChangeAt is bigger than jwtIssuedAt
     if (
       user.passwordChangedAt &&

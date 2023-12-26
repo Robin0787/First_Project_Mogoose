@@ -1,4 +1,5 @@
 import { Router } from "express";
+import auth from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validateRequest";
 import { academicFacultyControllers } from "./academicFaculty.controller";
 import { academicFacultyValidation } from "./academicFaculty.validation";
@@ -7,14 +8,20 @@ const router = Router();
 
 router.post(
   "/create-academic-faculty",
+  auth(),
   validateRequest(academicFacultyValidation.academicFacultyCreateValidation),
   academicFacultyControllers.createAcademicFaculty,
 );
 
-router.get("/", academicFacultyControllers.getAllAcademicFaculties);
-router.get("/:facultyId", academicFacultyControllers.getSingleAcademicFaculty);
+router.get("/", auth(), academicFacultyControllers.getAllAcademicFaculties);
+router.get(
+  "/:facultyId",
+  auth(),
+  academicFacultyControllers.getSingleAcademicFaculty,
+);
 router.patch(
   "/update-faculty/:facultyId",
+  auth(),
   validateRequest(academicFacultyValidation.academicFacultyUpdateValidation),
   academicFacultyControllers.updateFaculty,
 );

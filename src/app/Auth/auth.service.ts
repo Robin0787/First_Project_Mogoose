@@ -4,6 +4,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
 import { AppError } from "../errors/AppError";
 import { User } from "../modules/user/user.model";
+import { sendEmail } from "../utils/sendEmail";
 import { TLoginUser, TPasswordChange } from "./auth.interface";
 import { createToken } from "./auth.utils";
 
@@ -142,8 +143,45 @@ const refreshToken = async (token: string) => {
   return { accessToken };
 };
 
+const forgetPassword = async (userId: string) => {
+  // check the user exist or not
+  const user = await User.isUserExistsByCustomId(userId);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "This User is not found!");
+  }
+
+  // check the user is deleted or not
+  if (user.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, "This User is deleted!");
+  }
+
+  // check the user is blocked or not
+  if (user.status === "blocked") {
+    throw new AppError(httpStatus.FORBIDDEN, "This User is blocked!");
+  }
+
+  // create an token and send to client
+  const jwtPayload = {
+    id: user.id,
+    role: user.role,
+  };
+
+  const resetToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    "10m",
+  );
+
+  const resetUILink = `${config.reset_password_ui_link}?id=${user.id}&token=${resetToken}`;
+
+  sendEmail(user.email, resetUILink);
+  return {};
+};
+
 export const AuthServices = {
   loginUser,
   changePassword,
   refreshToken,
+  forgetPassword,
 };

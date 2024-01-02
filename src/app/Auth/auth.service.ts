@@ -5,7 +5,7 @@ import config from "../config";
 import { AppError } from "../errors/AppError";
 import { User } from "../modules/user/user.model";
 import { sendEmail } from "../utils/sendEmail";
-import { TLoginUser, TPasswordChange } from "./auth.interface";
+import { TLoginUser, TPasswordChange, TResetPassword } from "./auth.interface";
 import { createToken } from "./auth.utils";
 
 const loginUser = async (payload: TLoginUser) => {
@@ -179,9 +179,61 @@ const forgetPassword = async (userId: string) => {
   return {};
 };
 
+const resetPassword = async (payload: TResetPassword, token: string) => {
+  // check the user exist or not
+  const user = await User.isUserExistsByCustomId(payload.id);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "This User is not found!");
+  }
+
+  // check the user is deleted or not
+  if (user.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, "This User is deleted!");
+  }
+
+  // check the user is blocked or not
+  if (user.status === "blocked") {
+    throw new AppError(httpStatus.FORBIDDEN, "This User is blocked!");
+  }
+
+  const decoded = jwt.verify(
+    token,
+    config.jwt_access_secret as string,
+  ) as JwtPayload;
+
+  if (payload.id !== decoded.id) {
+    throw new AppError(httpStatus.BAD_REQUEST, "You are forbidden!");
+  }
+
+  // hash the newPassword before saving to DB
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt),
+  );
+
+  const result = await User.findOneAndUpdate(
+    {
+      id: decoded.id,
+      role: decoded.role,
+    },
+    {
+      password: newHashedPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(),
+    },
+    {
+      new: true,
+    },
+  );
+
+  return {};
+};
+
 export const AuthServices = {
   loginUser,
   changePassword,
   refreshToken,
   forgetPassword,
+  resetPassword,
 };

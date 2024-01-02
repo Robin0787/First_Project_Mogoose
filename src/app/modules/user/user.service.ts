@@ -1,4 +1,5 @@
 import httpStatus from "http-status";
+import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import config from "../../config";
 import { AppError } from "../../errors/AppError";
@@ -10,6 +11,7 @@ import { TFaculty } from "../faculty/faculty.interface";
 import { Faculty } from "../faculty/faculty.model";
 import { TStudent } from "../student/student.interface";
 import { Student } from "../student/student.model";
+import { USER_ROLE } from "./user.constant";
 import { TUser } from "./user.interface";
 import { User } from "./user.model";
 import {
@@ -165,8 +167,37 @@ const createAdminToDB = async (password: string, payload: TAdmin) => {
   }
 };
 
+const getMe = async (payload: JwtPayload) => {
+  const { id, role } = payload;
+
+  let result = null;
+  if (role === USER_ROLE.student) {
+    result = await Student.findOne({ id })
+      .populate("admissionSemester")
+      .populate({
+        path: "academicDepartment",
+        populate: {
+          path: "academicFaculty",
+        },
+      });
+  } else if (role === USER_ROLE.faculty) {
+    result = await Faculty.findOne({ id });
+  } else if (role === USER_ROLE.admin) {
+    result = await Admin.findOne({ id });
+  }
+
+  return result;
+};
+
+const changeUserStatus = async (id: string, payload: { status: string }) => {
+  const result = await User.findByIdAndUpdate(id, payload, { new: true });
+  return result;
+};
+
 export const userServices = {
   createStudentToDB,
   createFacultyToDB,
   createAdminToDB,
+  getMe,
+  changeUserStatus,
 };

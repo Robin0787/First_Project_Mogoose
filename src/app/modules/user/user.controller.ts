@@ -37,8 +37,31 @@ const createAdmin: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const getMe: RequestHandler = catchAsync(async (req, res) => {
+  const result = await userServices.getMe(req.user);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: `${req?.user?.role} is retrieved successfully`,
+    data: result,
+  });
+});
+
+const changeUserStatus: RequestHandler = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await userServices.changeUserStatus(id, req.body);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: `user status is changed successfully`,
+    data: result,
+  });
+});
+
 export const userControllers = {
   createUser,
   createFaculty,
   createAdmin,
+  getMe,
+  changeUserStatus,
 };

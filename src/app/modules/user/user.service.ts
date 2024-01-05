@@ -3,6 +3,7 @@ import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import config from "../../config";
 import { AppError } from "../../errors/AppError";
+import { sendImageToCloudinary } from "../../utils/sendImageToCloudinary";
 import { AcademicDepartment } from "../academicDepartment/academicDepartment.model";
 import { AcademicSemester } from "../academicSemester/academicSemester.model";
 import { TAdmin } from "../admin/admin.interface";
@@ -20,7 +21,11 @@ import {
   generateStudentId,
 } from "./user.utils";
 
-const createStudentToDB = async (password: string, payload: TStudent) => {
+const createStudentToDB = async (
+  password: string,
+  payload: TStudent,
+  file: any,
+) => {
   // create user object
   const userData: Partial<TUser> = {
     id: "",
@@ -40,6 +45,15 @@ const createStudentToDB = async (password: string, payload: TStudent) => {
     session.startTransaction();
     // setting users id
     userData.id = await generateStudentId(academicSemester);
+
+    const image_name = `${userData?.id} ${payload?.name?.firstName}`;
+
+    const uploadedImageData: any = await sendImageToCloudinary(
+      file?.path,
+      image_name,
+    );
+
+    payload.profileImage = uploadedImageData?.secure_url;
 
     // creating a user with transaction
     const createdUser = await User.create([userData], { session });

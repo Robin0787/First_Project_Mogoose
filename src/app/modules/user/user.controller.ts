@@ -1,12 +1,20 @@
 import { RequestHandler } from "express";
 import httpStatus from "http-status";
+import { AppError } from "../../errors/AppError";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { userServices } from "./user.service";
 
 const createUser: RequestHandler = catchAsync(async (req, res) => {
+  if (!req.file) {
+    throw new AppError(httpStatus.FORBIDDEN, "file is required");
+  }
   const { student: studentData, password } = req.body;
-  const result = await userServices.createStudentToDB(password, studentData);
+  const result = await userServices.createStudentToDB(
+    password,
+    studentData,
+    req.file,
+  );
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

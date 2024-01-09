@@ -46,7 +46,7 @@ const createStudentToDB = async (
     // setting users id
     userData.id = await generateStudentId(academicSemester);
 
-    const image_name = `${userData?.id} ${payload?.name?.firstName}`;
+    const image_name = `${payload?.name?.firstName}-${userData?.id}`;
 
     const uploadedImageData: any = await sendImageToCloudinary(
       file?.path,

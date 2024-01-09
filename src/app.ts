@@ -33,4 +33,5 @@ app.get("/", async (req: Request, res: Response) => {
 app.use(globalErrorHandler);
 // not found routes error
 app.use(notFoundRoute);
+
 export default app;

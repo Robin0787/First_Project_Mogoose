@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 import multer from "multer";
 import config from "../config";
 
@@ -18,6 +19,12 @@ export const sendImageToCloudinary = (path: string, image_name: string) => {
           reject(error);
         }
         resolve(result);
+        // delete the image file
+        fs.unlink(path, (err) => {
+          if (err) {
+            reject(err);
+          }
+        });
       },
     );
   });

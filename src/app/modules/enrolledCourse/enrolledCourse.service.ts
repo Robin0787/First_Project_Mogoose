@@ -1,6 +1,7 @@
 import httpStatus from "http-status";
 import mongoose from "mongoose";
 import { AppError } from "../../errors/AppError";
+import { Course } from "../course/course.model";
 import { OfferedCourse } from "../offeredCourse/offeredCourse.model";
 import { SemesterRegistration } from "../semesterRegistration/semesterRegistration.model";
 import { Student } from "../student/student.model";
@@ -87,14 +88,23 @@ const createEnrolledCourseIntoDB = async (
         totalEnrolledCredits: { $sum: "$enrolledCourseData.credits" },
       },
     },
+    {
+      $project: { _id: 0, totalEnrolledCredits: 1 },
+    },
   ]);
 
-  const totalEnrolledCredits = enrolledCourses[0]?.totalEnrolledCredits;
+  const totalEnrolledCourseCredits = enrolledCourses[0]?.totalEnrolledCredits;
 
-  if (totalEnrolledCredits > (semesterRegistration?.maxCredit as number)) {
+  const currentCourse = await Course.findById(offeredCourse.course);
+  const currentCourseCredits = currentCourse!.credits as number;
+
+  if (
+    totalEnrolledCourseCredits + currentCourseCredits >
+    (semesterRegistration?.maxCredit as number)
+  ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "Your credits doesn't allow you to enroll in this course.",
+      "You have exceeded maximum number of credits required for this course.",
     );
   }
 

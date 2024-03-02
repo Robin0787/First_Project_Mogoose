@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import mongoose from "mongoose";
 import { AppError } from "../../errors/AppError";
 import { Course } from "../course/course.model";
+import { Faculty } from "../faculty/faculty.model";
 import { OfferedCourse } from "../offeredCourse/offeredCourse.model";
 import { SemesterRegistration } from "../semesterRegistration/semesterRegistration.model";
 import { Student } from "../student/student.model";
@@ -138,6 +139,85 @@ const createEnrolledCourseIntoDB = async (
   }
 };
 
+const updateEnrolledCourseMarksIntoDB = async (
+  userId: string,
+  payload: Partial<TEnrolledCourse>,
+) => {
+  const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
+
+  const isSemesterRegistrationExists =
+    await SemesterRegistration.findById(semesterRegistration).select("_id");
+
+  if (!isSemesterRegistrationExists) {
+    throw new AppError(httpStatus.NOT_FOUND, "This semester doesn't exist");
+  }
+
+  const isOfferedCourseExists =
+    await OfferedCourse.findById(offeredCourse).select("_id");
+
+  if (!isOfferedCourseExists) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "This Offered Course doesn't exist",
+    );
+  }
+  const isStudentExists = await Student.findById(student).select("_id");
+
+  if (!isStudentExists) {
+    throw new AppError(httpStatus.NOT_FOUND, "This Student doesn't exist");
+  }
+
+  const faculty = await Faculty.findOne({ id: userId }).select("_id");
+
+  if (!faculty) {
+    throw new AppError(httpStatus.NOT_FOUND, "This Faculty doesn't exist");
+  }
+
+  const enrolledCourse = await EnrolledCourse.findOne({
+    semesterRegistration,
+    offeredCourse,
+    student,
+    faculty: faculty._id,
+  });
+
+  const isThisCourseBelongsToThisFaculty = enrolledCourse
+    ? enrolledCourse
+    : false;
+  if (!isThisCourseBelongsToThisFaculty) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "This course doesn't belong to this faculty",
+    );
+  }
+
+  // if (courseMarks?.finalTerm) {
+  //   const { classTest1, midTerm, classTest2, finalTerm } =
+  //     enrolledCourse!.courseMarks;
+
+  //   const totalMarks = classTest1 + midTerm + classTest2 + finalTerm;
+
+  //   console.log(totalMarks);
+  // }
+
+  const modifiedData: Record<string, unknown> = {};
+  if (courseMarks && Object.keys(courseMarks).length) {
+    for (const [key, value] of Object.entries(courseMarks)) {
+      modifiedData[`courseMarks.${key}`] = value;
+    }
+  } else {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid course marks");
+  }
+
+  const result = await EnrolledCourse.findByIdAndUpdate(
+    enrolledCourse?._id,
+    modifiedData,
+    { new: true },
+  );
+
+  return result;
+};
+
 export const EnrolledCourseServices = {
   createEnrolledCourseIntoDB,
+  updateEnrolledCourseMarksIntoDB,
 };

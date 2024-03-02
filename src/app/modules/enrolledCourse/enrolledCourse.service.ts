@@ -6,6 +6,7 @@ import { Faculty } from "../faculty/faculty.model";
 import { OfferedCourse } from "../offeredCourse/offeredCourse.model";
 import { SemesterRegistration } from "../semesterRegistration/semesterRegistration.model";
 import { Student } from "../student/student.model";
+import { calculatedGradeAndPoints } from "./enrolled.course.utils";
 import { TEnrolledCourse } from "./enrolledCourse.interface";
 import { EnrolledCourse } from "./enrolledCourse.model";
 
@@ -190,15 +191,6 @@ const updateEnrolledCourseMarksIntoDB = async (
     );
   }
 
-  // if (courseMarks?.finalTerm) {
-  //   const { classTest1, midTerm, classTest2, finalTerm } =
-  //     enrolledCourse!.courseMarks;
-
-  //   const totalMarks = classTest1 + midTerm + classTest2 + finalTerm;
-
-  //   console.log(totalMarks);
-  // }
-
   const modifiedData: Record<string, unknown> = {};
   if (courseMarks && Object.keys(courseMarks).length) {
     for (const [key, value] of Object.entries(courseMarks)) {
@@ -206,6 +198,21 @@ const updateEnrolledCourseMarksIntoDB = async (
     }
   } else {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid course marks");
+  }
+
+  if (courseMarks?.finalTerm) {
+    const marksOfCourse = enrolledCourse!.courseMarks;
+
+    const totalMarks =
+      Math.ceil(marksOfCourse!.classTest1 * 0.1) +
+      Math.ceil(marksOfCourse!.midTerm * 0.3) +
+      Math.ceil(marksOfCourse!.classTest2 * 0.1) +
+      Math.ceil(marksOfCourse!.finalTerm * 0.5);
+
+    const result = calculatedGradeAndPoints(totalMarks);
+    modifiedData.grade = result.grade;
+    modifiedData.gradePoints = result.gradePoints;
+    modifiedData.isCompleted = true;
   }
 
   const result = await EnrolledCourse.findByIdAndUpdate(

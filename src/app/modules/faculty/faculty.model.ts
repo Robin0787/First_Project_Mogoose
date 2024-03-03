@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import validator from "validator";
+import config from "../../config";
 import { TFaculty, TFacultyName } from "./faculty.interface";
 
 const facultyNameSchema = new Schema<TFacultyName>({
@@ -75,7 +76,7 @@ const facultySchema = new Schema<TFaculty>(
     },
     academicDepartment: {
       type: Schema.Types.ObjectId,
-      required: true,
+      required: [true, "academicDepartment is required"],
       ref: "academicDepartment",
     },
     academicFaculty: {
@@ -99,6 +100,7 @@ const facultySchema = new Schema<TFaculty>(
     profileImage: {
       type: String,
       required: false,
+      default: config.default_user_image as string,
     },
     isDeleted: {
       type: String,

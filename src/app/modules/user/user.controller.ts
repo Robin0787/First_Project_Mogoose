@@ -1,14 +1,10 @@
 import { RequestHandler } from "express";
 import httpStatus from "http-status";
-import { AppError } from "../../errors/AppError";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { userServices } from "./user.service";
 
-const createUser: RequestHandler = catchAsync(async (req, res) => {
-  if (!req.file) {
-    throw new AppError(httpStatus.FORBIDDEN, "file is required");
-  }
+const createStudent: RequestHandler = catchAsync(async (req, res) => {
   const { student: studentData, password } = req.body;
   const result = await userServices.createStudentToDB(
     password,
@@ -18,14 +14,18 @@ const createUser: RequestHandler = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Student created successfully",
+    message: "Student is created successfully",
     data: result,
   });
 });
 
 const createFaculty: RequestHandler = catchAsync(async (req, res) => {
   const { faculty: facultyData, password } = req.body;
-  const result = await userServices.createFacultyToDB(password, facultyData);
+  const result = await userServices.createFacultyToDB(
+    password,
+    facultyData,
+    req.file,
+  );
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -36,7 +36,11 @@ const createFaculty: RequestHandler = catchAsync(async (req, res) => {
 
 const createAdmin: RequestHandler = catchAsync(async (req, res) => {
   const { admin: adminData, password } = req.body;
-  const result = await userServices.createAdminToDB(password, adminData);
+  const result = await userServices.createAdminToDB(
+    password,
+    adminData,
+    req.file,
+  );
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -67,7 +71,7 @@ const changeUserStatus: RequestHandler = catchAsync(async (req, res) => {
 });
 
 export const userControllers = {
-  createUser,
+  createStudent,
   createFaculty,
   createAdmin,
   getMe,

@@ -2,6 +2,7 @@ import { Schema, model } from "mongoose";
 
 import validator from "validator";
 
+import config from "../../config";
 import {
   StudentModel,
   TGuardian,
@@ -85,15 +86,20 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     dateOfBirth: { type: Date },
     contactNo: { type: String, required: true },
     emergencyContactNo: { type: String, required: true },
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "academicSemester",
+    },
     academicDepartment: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: "academicDepartment",
     },
-    admissionSemester: {
+    academicFaculty: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "academicSemester",
+      ref: "academicFaculty",
     },
     bloodGroup: {
       type: String,
@@ -109,7 +115,10 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       type: localGuardianSchema,
       required: true,
     },
-    profileImage: { type: String },
+    profileImage: {
+      type: String,
+      default: config.default_user_image as string,
+    },
     isDeleted: { type: Boolean, default: false },
   },
   {

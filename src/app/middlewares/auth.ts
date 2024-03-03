@@ -56,7 +56,6 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     if (requiredRoles.length > 0 && !requiredRoles.includes(role)) {
-      console.log({ requiredRoles, decodedRole: role });
       throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
     }
     req.user = decoded as JwtPayload;

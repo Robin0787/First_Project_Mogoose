@@ -42,8 +42,9 @@ export interface TStudent {
   dateOfBirth?: Date;
   contactNo: string;
   emergencyContactNo: string;
-  academicDepartment: Types.ObjectId;
   admissionSemester: Types.ObjectId;
+  academicDepartment: Types.ObjectId;
+  academicFaculty: Types.ObjectId;
   bloodGroup?: BloodGroup;
   presentAddress: string;
   permanentAddress: string;

@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import validator from "validator";
+import config from "../../config";
 import { TAdmin, TAdminName } from "./admin.interface";
 
 const adminNameSchema = new Schema<TAdminName>({
@@ -94,6 +95,7 @@ const adminSchema = new Schema<TAdmin>(
     profileImage: {
       type: String,
       required: false,
+      default: config.default_user_image as string,
     },
     isDeleted: {
       type: String,

@@ -34,10 +34,35 @@ const createStudentToDB = async (
     role: "student",
   };
 
+  if (await User.findOne({ email: payload.email })) {
+    throw new AppError(httpStatus.CONFLICT, "Student already exists");
+  }
+
   // getting academic semester information
   const academicSemester = await AcademicSemester.findById(
     payload.admissionSemester,
   );
+
+  if (!academicSemester) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Admission Semester doesn't exist",
+    );
+  }
+
+  // getting academic department information
+  const academicDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  );
+
+  if (!academicDepartment) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Academic Department doesn't exist",
+    );
+  }
+
+  payload.academicFaculty = academicDepartment.academicFaculty;
 
   const session = await mongoose.startSession();
 
@@ -46,14 +71,16 @@ const createStudentToDB = async (
     // setting users id
     userData.id = await generateStudentId(academicSemester);
 
-    const image_name = `${payload?.name?.firstName}-${userData?.id}`;
+    if (file) {
+      const image_name = `${payload?.name?.firstName}-${userData?.id}`;
 
-    const uploadedImageData: any = await sendImageToCloudinary(
-      file?.path,
-      image_name,
-    );
+      const uploadedImageData: any = await sendImageToCloudinary(
+        file?.path,
+        image_name,
+      );
 
-    payload.profileImage = uploadedImageData?.secure_url;
+      payload.profileImage = uploadedImageData?.secure_url as string;
+    }
 
     // creating a user with transaction
     const createdUser = await User.create([userData], { session });
@@ -82,7 +109,11 @@ const createStudentToDB = async (
   }
 };
 
-const createFacultyToDB = async (password: string, payload: TFaculty) => {
+const createFacultyToDB = async (
+  password: string,
+  payload: TFaculty,
+  file: any,
+) => {
   // create user object
   const userData: Partial<TUser> = {
     id: "",
@@ -90,6 +121,10 @@ const createFacultyToDB = async (password: string, payload: TFaculty) => {
     password: password || (config.default_pass as string),
     role: "faculty",
   };
+
+  if (await User.findOne({ email: payload.email })) {
+    throw new AppError(httpStatus.CONFLICT, "Faculty already exists");
+  }
 
   // find academic department info
   const academicDepartment = await AcademicDepartment.findById(
@@ -103,6 +138,8 @@ const createFacultyToDB = async (password: string, payload: TFaculty) => {
     );
   }
 
+  payload.academicFaculty = academicDepartment.academicFaculty;
+
   const session = await mongoose.startSession();
 
   try {
@@ -110,6 +147,17 @@ const createFacultyToDB = async (password: string, payload: TFaculty) => {
 
     // generating faculty id
     userData.id = await generateFacultyId();
+
+    if (file) {
+      const image_name = `${payload?.name?.firstName}-${userData?.id}`;
+
+      const uploadedImageData: any = await sendImageToCloudinary(
+        file?.path,
+        image_name,
+      );
+
+      payload.profileImage = uploadedImageData?.secure_url as string;
+    }
 
     const createdFacultyUser = await User.create([userData], { session });
 
@@ -138,7 +186,11 @@ const createFacultyToDB = async (password: string, payload: TFaculty) => {
   }
 };
 
-const createAdminToDB = async (password: string, payload: TAdmin) => {
+const createAdminToDB = async (
+  password: string,
+  payload: TAdmin,
+  file: any,
+) => {
   // create user object
   const userData: Partial<TUser> = {
     id: "",
@@ -147,12 +199,26 @@ const createAdminToDB = async (password: string, payload: TAdmin) => {
     role: "admin",
   };
 
+  if (await User.findOne({ email: payload.email })) {
+    throw new AppError(httpStatus.CONFLICT, "Admin already exists");
+  }
+
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
 
     userData.id = await generateAdminId();
+    if (file) {
+      const image_name = `${payload?.name?.firstName}-${userData?.id}`;
+
+      const uploadedImageData: any = await sendImageToCloudinary(
+        file?.path,
+        image_name,
+      );
+
+      payload.profileImage = uploadedImageData?.secure_url as string;
+    }
 
     // creating a user with transaction
     const createdUser = await User.create([userData], { session });

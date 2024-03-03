@@ -27,7 +27,6 @@ const facultyCreateValidationSchema = z.object({
       contactNo: z.string(),
       emergencyContactNo: z.string(),
       academicDepartment: z.string(),
-      academicFaculty: z.string(),
       bloodGroup: z
         .enum(["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"])
         .optional(),

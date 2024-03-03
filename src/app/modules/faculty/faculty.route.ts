@@ -7,9 +7,13 @@ const router = Router();
 
 router.get(
   "",
-  auth(USER_ROLE.admin, USER_ROLE.faculty),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   facultyControllers.getAllFaculties,
 );
-router.get("/:facultyId", auth(), facultyControllers.getSingleFaculty);
+router.get(
+  "/:facultyId",
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
+  facultyControllers.getSingleFaculty,
+);
 
 export const facultyRoutes = router;

@@ -9,7 +9,10 @@ cloudinary.config({
   api_secret: config.cloudinary_api_secret,
 });
 
-export const sendImageToCloudinary = (path: string, image_name: string) => {
+export const sendImageToCloudinary = (
+  path: string,
+  image_name: string,
+): Promise<Record<string, unknown>> => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload(
       path,
@@ -17,8 +20,9 @@ export const sendImageToCloudinary = (path: string, image_name: string) => {
       function (error, result) {
         if (error) {
           reject(error);
+        } else if (result) {
+          resolve(result);
         }
-        resolve(result);
         // delete the image file
         fs.unlink(path, (err) => {
           if (err) {

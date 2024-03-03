@@ -200,28 +200,50 @@ const updateEnrolledCourseMarksIntoDB = async (
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid course marks");
   }
 
-  if (courseMarks?.finalTerm) {
-    const marksOfCourse = enrolledCourse!.courseMarks;
+  const session = await mongoose.startSession();
 
-    const totalMarks =
-      Math.ceil(marksOfCourse!.classTest1 * 0.1) +
-      Math.ceil(marksOfCourse!.midTerm * 0.3) +
-      Math.ceil(marksOfCourse!.classTest2 * 0.1) +
-      Math.ceil(marksOfCourse!.finalTerm * 0.5);
+  try {
+    session.startTransaction();
 
-    const result = calculatedGradeAndPoints(totalMarks);
-    modifiedData.grade = result.grade;
-    modifiedData.gradePoints = result.gradePoints;
-    modifiedData.isCompleted = true;
+    const updatedEnrolledCourse = await EnrolledCourse.findByIdAndUpdate(
+      enrolledCourse?._id,
+      modifiedData,
+      { new: true, session },
+    );
+
+    if (courseMarks?.finalTerm) {
+      const marksOfCourse = updatedEnrolledCourse!.courseMarks;
+
+      const totalMarks =
+        Math.ceil(marksOfCourse!.classTest1 * 0.1) +
+        Math.ceil(marksOfCourse!.midTerm * 0.3) +
+        Math.ceil(marksOfCourse!.classTest2 * 0.1) +
+        Math.ceil(marksOfCourse!.finalTerm * 0.5);
+
+      const calculatedResult = calculatedGradeAndPoints(totalMarks);
+
+      const result = await EnrolledCourse.findByIdAndUpdate(
+        enrolledCourse?._id,
+        {
+          grade: calculatedResult.grade,
+          gradePoints: calculatedResult.gradePoints,
+          isCompleted: true,
+        },
+        { new: true, session },
+      );
+      await session.commitTransaction();
+      await session.endSession();
+      return result;
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+    return updatedEnrolledCourse;
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(httpStatus.FORBIDDEN, "Failed to update course marks");
   }
-
-  const result = await EnrolledCourse.findByIdAndUpdate(
-    enrolledCourse?._id,
-    modifiedData,
-    { new: true },
-  );
-
-  return result;
 };
 
 export const EnrolledCourseServices = {

@@ -221,6 +221,12 @@ const getMyOfferedCoursesFromDB = async (
         isAlreadyEnrolled: false,
       },
     },
+    {
+      $project: {
+        enrolledCourses: 0,
+        isAlreadyEnrolled: 0,
+      },
+    },
   ]);
 
   return result;

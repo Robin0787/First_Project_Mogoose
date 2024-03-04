@@ -1,4 +1,5 @@
 import { FilterQuery, Query } from "mongoose";
+import { TMeta } from "../utils/sendResponse";
 
 class QueryBuilder<T> {
   public modelQuery: Query<T[], T>;
@@ -59,12 +60,13 @@ class QueryBuilder<T> {
     const limit = Number(this.query.limit) || 10;
     const totalData = await this.modelQuery.model.countDocuments(totalQueries);
     const totalPage = Math.ceil(totalData / limit);
-    return {
+    const returnData: TMeta = {
       page,
       limit,
       totalPage,
       totalData,
     };
+    return returnData;
   }
 }
 

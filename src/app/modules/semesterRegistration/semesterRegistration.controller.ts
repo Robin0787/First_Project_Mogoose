@@ -25,7 +25,8 @@ const getAllSemesterRegistration = catchAsync(async (req, res) => {
     success: true,
     statusCode: httpStatus.OK,
     message: "All Semester registrations are retrieved successfully",
-    data: result,
+    meta: result?.meta,
+    data: result?.data,
   });
 });
 
@@ -68,11 +69,10 @@ const deleteSemesterRegistration = catchAsync(async (req, res) => {
   });
 });
 
-
 export const semesterRegistrationControllers = {
   createSemesterRegistration,
   getAllSemesterRegistration,
   getSingleSemesterRegistration,
   updateSemesterRegistration,
-  deleteSemesterRegistration
+  deleteSemesterRegistration,
 };

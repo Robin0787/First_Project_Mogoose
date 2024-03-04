@@ -66,7 +66,8 @@ const getAllSemesterRegistrationFromDB = async (
     .paginate()
     .filterFields();
   const result = await semesterRegistrationQuery.modelQuery;
-  return result;
+  const countTotal = await semesterRegistrationQuery.countTotal();
+  return { meta: countTotal, data: result };
 };
 
 const getSingleSemesterRegistrationFromDB = async (id: string) => {

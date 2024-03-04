@@ -10,7 +10,8 @@ const getAllStudents: RequestHandler = catchAsync(async (req, res) => {
     success: true,
     statusCode: httpStatus.OK,
     message: "Students are retrieve successfully.",
-    data: result,
+    meta: result?.meta,
+    data: result?.data,
   });
 });
 

@@ -4,12 +4,13 @@ import sendResponse from "../../utils/sendResponse";
 import { facultyServices } from "./faculty.service";
 
 const getAllFaculties = catchAsync(async (req, res) => {
-  const result = await facultyServices.getAllFacultiesFromDB();
+  const result = await facultyServices.getAllFacultiesFromDB(req.query);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "Faculties are retrieved successfully",
-    data: result,
+    meta: result?.meta,
+    data: result?.data,
   });
 });
 

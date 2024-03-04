@@ -1,4 +1,5 @@
 import httpStatus from "http-status";
+import QueryBuilder from "../../builder/QueryBuilder";
 import { AppError } from "../../errors/AppError";
 import { TAcademicFaculty } from "./academicFaculty.interface";
 import { AcademicFaculty } from "./academicFaculty.model";
@@ -8,9 +9,18 @@ const createAcademicFacultyToDB = async (payload: TAcademicFaculty) => {
   return result;
 };
 
-const getAllAcademicFacultiesFromDB = async () => {
-  const result = await AcademicFaculty.find({});
-  return result;
+const getAllAcademicFacultiesFromDB = async (
+  query: Record<string, unknown>,
+) => {
+  const modelQueryForBuilder = AcademicFaculty.find();
+  const academicFacultyQuery = new QueryBuilder(modelQueryForBuilder, query)
+    .filter()
+    .sort()
+    .paginate()
+    .filterFields();
+  const result = await academicFacultyQuery.modelQuery;
+  const countTotal = await academicFacultyQuery.countTotal();
+  return { meta: countTotal, data: result };
 };
 
 const getSingleAcademicFacultiesFromDB = async (facultyId: string) => {

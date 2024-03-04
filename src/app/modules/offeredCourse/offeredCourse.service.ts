@@ -148,7 +148,11 @@ const getMyOfferedCoursesFromDB = async (
     throw new AppError(httpStatus.NOT_FOUND, "There is no ONGOING semester");
   }
 
-  const result = await OfferedCourse.aggregate([
+  const page = Number(query?.page) || 1;
+  const limit = Number(query?.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const aggregationQuery = [
     {
       $match: {
         semesterRegistration: currentOngoingRegisteredSemester._id,
@@ -278,9 +282,36 @@ const getMyOfferedCoursesFromDB = async (
         isAlreadyEnrolled: 0,
       },
     },
+  ];
+
+  const paginationQuery = [
+    {
+      $skip: skip,
+    },
+    {
+      $limit: limit,
+    },
+  ];
+
+  const result = await OfferedCourse.aggregate([
+    ...aggregationQuery,
+    ...paginationQuery,
   ]);
 
-  return result;
+  const total = await OfferedCourse.aggregate(aggregationQuery);
+
+  const totalData = total?.length || 0;
+  const totalPage = Math.ceil(totalData / limit);
+
+  return {
+    meta: {
+      page,
+      limit,
+      totalPage,
+      totalData,
+    },
+    data: result,
+  };
 };
 
 const getSingleOfferedCourseFromDB = async (id: string) => {

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import auth from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validateRequest";
+import { USER_ROLE } from "../user/user.constant";
 import { academicDepartmentControllers } from "./academicDepartment.controller";
 import { academicDepartmentValidations } from "./academicDepartment.validation";
 
@@ -8,7 +9,7 @@ const router = Router();
 
 router.post(
   "/create-academic-department",
-  auth(),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   validateRequest(
     academicDepartmentValidations.academicDepartmentCreateValidationSchema,
   ),
@@ -23,7 +24,7 @@ router.get(
 );
 router.patch(
   "/update-academic-department/:departmentId",
-  auth(),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   validateRequest(
     academicDepartmentValidations.academicDepartmentUpdateValidationSchema,
   ),

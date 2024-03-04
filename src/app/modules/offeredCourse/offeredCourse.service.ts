@@ -1,4 +1,5 @@
 import httpStatus from "http-status";
+import QueryBuilder from "../../builder/QueryBuilder";
 import { AppError } from "../../errors/AppError";
 import { AcademicDepartment } from "../academicDepartment/academicDepartment.model";
 import { AcademicFaculty } from "../academicFaculty/academicFaculty.model";
@@ -6,6 +7,7 @@ import { Course } from "../course/course.model";
 import { Faculty } from "../faculty/faculty.model";
 import { RegistrationStatus } from "../semesterRegistration/semesterRegistration.constant";
 import { SemesterRegistration } from "../semesterRegistration/semesterRegistration.model";
+import { Student } from "../student/student.model";
 import { TSchedule } from "./offeredCourse.constant";
 import { TOfferedCourse } from "./offeredCourse.interface";
 import { OfferedCourse } from "./offeredCourse.model";
@@ -116,8 +118,111 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
   return result;
 };
 
-const getAllOfferedCourseFromDB = async () => {
-  const result = await OfferedCourse.find();
+const getAllOfferedCourseFromDB = async (query: Record<string, unknown>) => {
+  const modelQueryForBuilder = OfferedCourse.find();
+  const courseQuery = new QueryBuilder(modelQueryForBuilder, query)
+    .filter()
+    .sort()
+    .paginate()
+    .filterFields();
+  const result = await courseQuery.modelQuery;
+  const countTotal = await courseQuery.countTotal();
+  return { meta: countTotal, data: result };
+};
+
+const getMyOfferedCoursesFromDB = async (
+  studentId: string,
+  query: Record<string, unknown>,
+) => {
+  const student = await Student.findOne({ id: studentId });
+  if (!student) {
+    throw new AppError(httpStatus.NOT_FOUND, "Student doesn't exist");
+  }
+
+  // find the current ONGOING semester
+  const currentOngoingRegisteredSemester = await SemesterRegistration.findOne({
+    status: "ONGOING",
+  });
+
+  if (!currentOngoingRegisteredSemester) {
+    throw new AppError(httpStatus.NOT_FOUND, "There is no ONGOING semester");
+  }
+
+  const result = await OfferedCourse.aggregate([
+    {
+      $match: {
+        semesterRegistration: currentOngoingRegisteredSemester._id,
+        academicDepartment: student.academicDepartment,
+        academicFaculty: student.academicFaculty,
+      },
+    },
+    {
+      $lookup: {
+        from: "courses",
+        localField: "course",
+        foreignField: "_id",
+        as: "course",
+      },
+    },
+    {
+      $unwind: "$course",
+    },
+    {
+      $lookup: {
+        from: "enrolledcourses",
+        let: {
+          currentOngoingRegisteredSemester:
+            currentOngoingRegisteredSemester._id,
+          currentStudent: student._id,
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  {
+                    $eq: [
+                      "$semesterRegistration",
+                      "$$currentOngoingRegisteredSemester",
+                    ],
+                  },
+                  {
+                    $eq: ["$student", "$$currentStudent"],
+                  },
+                  {
+                    $eq: ["$isEnrolled", true],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        as: "enrolledCourses",
+      },
+    },
+    {
+      $addFields: {
+        isAlreadyEnrolled: {
+          $in: [
+            "$course._id",
+            {
+              $map: {
+                input: "$enrolledCourses",
+                as: "enroll",
+                in: "$$enroll.course",
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      $match: {
+        isAlreadyEnrolled: false,
+      },
+    },
+  ]);
+
   return result;
 };
 
@@ -219,6 +324,7 @@ const deleteOfferedCourseFromDB = async (id: string) => {
 export const offeredCourseServices = {
   createOfferedCourseIntoDB,
   getAllOfferedCourseFromDB,
+  getMyOfferedCoursesFromDB,
   getSingleOfferedCourseFromDB,
   updateOfferedCourseIntoDB,
   deleteOfferedCourseFromDB,

@@ -7,6 +7,8 @@ import { AcademicSemesterValidation } from "./academicSemester.validation";
 
 const router = Router();
 
+router.get("", auth(), AcademicSemesterControllers.getAllSemester);
+
 router.post(
   "/create-academic-semester",
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
@@ -15,11 +17,7 @@ router.post(
   ),
   AcademicSemesterControllers.createAcademicSemester,
 );
-router.get(
-  "/get-all-semester",
-  auth(),
-  AcademicSemesterControllers.getAllSemester,
-);
+
 router.get(
   "/:semesterId",
   auth(),

@@ -41,7 +41,7 @@ const studentCreateValidationSchema = z.object({
       .max(16, { message: "password can contain 16 characters at max." })
       .optional(),
     student: z.object({
-      id: z.string(),
+      id: z.string().optional(),
       name: studentNameSchema,
       email: z.string().email(),
       gender: z.enum(["Male", "Female"]),

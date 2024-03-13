@@ -18,7 +18,6 @@ const facultyNameSchema = z.object({
 const facultyCreateValidationSchema = z.object({
   body: z.object({
     faculty: z.object({
-      id: z.string(),
       name: facultyNameSchema,
       designation: z.string(),
       email: z.string().email(),

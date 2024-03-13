@@ -18,7 +18,7 @@ export type BloodGroup =
 
 export type TGender = "Male" | "Female";
 export interface TFaculty {
-  id: string;
+  id?: string;
   user: Types.ObjectId;
   name: TFacultyName;
   designation: string;

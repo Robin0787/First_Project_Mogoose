@@ -18,7 +18,6 @@ const adminNameSchema = z.object({
 const adminCreateValidationSchema = z.object({
   body: z.object({
     admin: z.object({
-      id: z.string(),
       name: adminNameSchema,
       designation: z.string(),
       email: z.string().email(),

@@ -107,4 +107,9 @@ const adminSchema = new Schema<TAdmin>(
   },
 );
 
+// virtual
+adminSchema.virtual("fullName").get(function () {
+  return `${this?.name?.firstName} ${this?.name?.lastName}`;
+});
+
 export const Admin = model<TAdmin>("admin", adminSchema);

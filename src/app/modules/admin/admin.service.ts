@@ -4,7 +4,7 @@ import { AppError } from "../../errors/AppError";
 import { Admin } from "./admin.model";
 
 const getAllAdminsFromDB = async (query: Record<string, unknown>) => {
-  const modelQueryForBuilder = Admin.find();
+  const modelQueryForBuilder = Admin.find().populate("managementDepartment");
   const adminQuery = new QueryBuilder(modelQueryForBuilder, query)
     .filter()
     .sort()

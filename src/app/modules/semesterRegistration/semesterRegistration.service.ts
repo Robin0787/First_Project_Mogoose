@@ -52,6 +52,26 @@ const createSemesterRegistrationIntoDB = async (
     );
   }
 
+  if (payload.minCredit < 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Min credit can't be smaller than 0",
+    );
+  }
+  if (payload.maxCredit <= 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Max credit must be greater than 0",
+    );
+  }
+
+  if (payload.minCredit > payload.maxCredit) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Max credit must be greater than Min credit",
+    );
+  }
+
   const result = await SemesterRegistration.create(payload);
   return result;
 };

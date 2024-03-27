@@ -119,7 +119,7 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
 };
 
 const getAllOfferedCourseFromDB = async (query: Record<string, unknown>) => {
-  const modelQueryForBuilder = OfferedCourse.find();
+  const modelQueryForBuilder = OfferedCourse.find().populate("semesterRegistration").populate("academicSemester").populate("academicFaculty").populate("academicDepartment").populate("course").populate("faculty");
   const courseQuery = new QueryBuilder(modelQueryForBuilder, query)
     .filter()
     .sort()

@@ -40,27 +40,27 @@ const enrolledCourseSchema = new Schema<TEnrolledCourse>({
   semesterRegistration: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: "SemesterRegistration",
+    ref: "semesterRegistration",
   },
   academicSemester: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: "AcademicSemester",
+    ref: "academicSemester",
   },
   academicFaculty: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: "AcademicFaculty",
+    ref: "academicFaculty",
   },
   academicDepartment: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: "AcademicDepartment",
+    ref: "academicDepartment",
   },
   offeredCourse: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: "OfferedCourse",
+    ref: "offeredCourse",
   },
   course: {
     type: Schema.Types.ObjectId,
@@ -70,7 +70,7 @@ const enrolledCourseSchema = new Schema<TEnrolledCourse>({
   student: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: "Student",
+    ref: "student",
   },
   faculty: {
     type: Schema.Types.ObjectId,

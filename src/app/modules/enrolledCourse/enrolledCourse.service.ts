@@ -152,7 +152,15 @@ const getMyEnrolledCoursesFromDB = async (
 
   const modelQueryForBuilder = EnrolledCourse.find({
     student: student._id,
-  }).populate("course");
+  })
+    .populate("course")
+    .populate("semesterRegistration")
+    .populate("academicSemester")
+    .populate("academicFaculty")
+    .populate("academicDepartment")
+    .populate("offeredCourse")
+    .populate("faculty")
+    .populate("student");
 
   const studentQuery = new QueryBuilder(modelQueryForBuilder, query)
     .filter()
